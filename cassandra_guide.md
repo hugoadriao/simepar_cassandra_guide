@@ -28,143 +28,105 @@ Now the user can run commands with super user privileges.
 To change to the new user, run this command.
 - <kbd>\# su - username</kbd>  
 
-# 3. Install Java 8.
-## 3.1 Install wget.
-To install wget run this command.
-- <kbd>$ sudo yum install wget</kbd>
-## 3.2 Install Java 8.
-To install OpenJDK 8 JDK run this command.
-- <kbd>$ cd ~</kbd>
-
-To download Java execute:
-- <kbd>$ wget --no-cookies --no-check-certificate --header "Cookie:oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm"</kbd>
-
-To install Java execute the following command.
-- <kbd>yum -y localinstall jdk-8u131-linux-x64.rpm</kbd>
-## 3.3 Checking installation.
-You can now check the ***Java*** version using the following command.
-- <kbd>$ java -version  </kbd>  
-  
-You alson need to check if **JAVA_HOME** environment variable is set. Run this command.
-- <kbd>$ echo $JAVA_HOME</kbd>  
-
-If you get a null or blank output, you'll need manually set the **JAVA_HOME** variable.  
-### 3.3.1 Manually setting JAVA_HOME variable
-<blockquote>
-The next step can be made with vim, but if you don't have familiarity, you can use **nano**.  
-
-- <kbd>$ yum install nano</kbd>
-</blockquote>
-
-- <kbd>$ nano ~/.bash_profile</kbd>
-
-Now add the copied path at the end of file and edit it to looks like the following
-
-<blockquote>
-    export JAVA_HOME=/usr/java/jdk1.8.0_131/
-</blockquote>
-<blockquote>
-    export JRE_HOME=/usr/java/jdk1.8.0_131/jre 
-</blockquote>
-
-The command <kbd>$ echo $JAVA_HOME</kbd> should return something like:  
-<kbd>/usr/java/jdk1.8.0_131/</kbd>
-
-## 4. Install Cassandra
-For this part we will assume that we have this scenario:
-- Machine 1:
-  - IP: 192.168.122.100
-  - OS: CentOS 7
-- Machine 2:
-  - IP: 192.168.122.101
-  - OS: CentOS 7
-- Machine 3:
-  - IP: 192.168.122.102
-  - OS: CentOS 7
-### 4.x Cassandra Configuration
-- Open the file <kbd>$ sudo nano /etc/cassandra/conf/cassandra-env.sh</kbd>
-- Change the line <kbd> JVM_OPTS="\$JVM_OPTS -Djava.rmi.server.hostname=\<localhost></kbd> to <kbd>JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=192.168.122.10X"</kbd>  
-**change the "*X*" to correspond with the IP**
-- Open the file <kbd>$ sudo nano /etc/rc.d/init.d/cassandra</kbd>
-- Change the following lines:
- ```
-  # Cassandra startup  
-    echo -n "Starting Cassandra: "  
-    [ -d `dirname "$pid_file"` ] || \  
-        install -m 755 -o $CASSANDRA_OWNR -g $CASSANDRA_OWNR -d `dirname $pid_file`  
-    su $CASSANDRA_OWNR -c "$CASSANDRA_PROG -p $pid_file" > $log_file 2>&1 
-    retval=$?  
-    [ $retval -eq 0 ] && touch $lock_file  
-    echo "OK"  
-    ;;  
+## 3. Install Docker.
+- Unistall old Docker version
 ```
+  $ sudo yum remove docker \
+                    docker-client \
+                    docker-client-latest \
+                    docker-common \
+                    docker-latest \
+                    docker-latest-logrotate \
+                    docker-logrotate \
+                    docker-engine
 ```
-# Cassandra startup
-    echo -n "Starting Cassandra: "
-    [ -d `dirname "$pid_file"` ] || \
-        install -m 755 -o $CASSANDRA_OWNR -g $CASSANDRA_OWNR -d `dirname $pid_file`
-    # su $CASSANDRA_OWNR -c "$CASSANDRA_PROG -p $pid_file" > $log_file 2>&1
-    runuser -u $CASSANDRA_OWNR -- $CASSANDRA_PROG -p $pid_file > $log_file 2>&1
-    chown root.root $pid_file
-    retval=$?
-    [ $retval -eq 0 ] && touch $lock_file
-    echo "OK"
-    ;;
+- Install some useful packages
 ```
-- In the same file <kbd>/etc/rc.d/init.d/cassandra</kbd>
-- Change: 
+  $ sudo yum install -y yum-utils \
+    device-mapper-persistent-data \
+    lvm2
 ```
-# Cassandra shutdown
-        echo -n "Shutdown Cassandra: "
-        su $CASSANDRA_OWNR -c "kill `cat $pid_file`"
-        retval=$?
-        [ $retval -eq 0 ] && rm -f $lock_file
-        for t in `seq 40`; do
-            status -p $pid_file cassandra > /dev/null 2>&1
-            retval=$?
-            if [ $retval -eq 3 ]; then
-                echo "OK"
-                exit 0
-            else
-                sleep 0.5
-            fi;
-        done
+-  Execute the following command to set up the stabe repository
 ```
+    $ sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
 ```
-# Cassandra shutdown
-        echo -n "Shutdown Cassandra: "
-        # su $CASSANDRA_OWNR -c "kill `cat $pid_file`"
-        runuser -u $CASSANDRA_OWNR -- kill `cat $pid_file`
-        retval=$?
-        [ $retval -eq 0 ] && rm -f $lock_file
-        for t in `seq 40`; do
-            status -p $pid_file cassandra > /dev/null 2>&1
-            retval=$?
-            if [ $retval -eq 3 ]; then
-                echo "OK"
-                exit 0
-            else
-                sleep 0.5
-            fi;
-        done
+- Install the latest version of Docker Engine - Community and containerd - with the following command
+<kbd>
+  $ sudo yum install docker-ce docker-ce-cli containerd.io
+</kbd>
+## 4. Docker post-installation Steps
+- Start Docker
+<kbd>
+sudo systemctl start docker
+</kbd>
+- Verify that Docker is installed correctly
+<kbd>
+$ sudo docker run hello-world
+</kbd>
+- The result should be, something like this:
 ```
-- Execute <kbd>$ systemctl daemon-reload</kbd>
-- Start Cassandra <kbd>$ service cassandra start</kbd>
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+- Enable Docker to autostart <kbd>sudo systemctl enable docker</kbd>
+- Add your user to the docker group to get rid of the need of typing ***sudo*** each time you run docker command <kbd>$ sudo usermod -aG docker $USER</kbd>
+
+## 5. Cassandra Docker Cluster
+Let's assume the following scenario:  
+- Machine1:
+  - IP: 10.10.10.1
+  - Docker name: climatos1
+- Machine2:
+  - IP: 10.10.10.2
+  - Docker name: climatos2
+- Machine3:
+  - IP: 10.10.10.3
+  - Docker name: climatos3
+- All in the same datacenter
+### 5.1 Download Locally Cassandra Docker Image
+- Run <kbd>$ docker pull cassandra</kbd>
+- You can specify a version <kbd>$ docker pull cassandra:3.11.6</kbd>
+### 5.1 Creating a Standard Cassandra Cluster
+- <kbd>$ docker run --name docker_name -v /my/own/datadir:/var/lib/cassandra -d -e CASSANDRA_BROADCAST_ADDRESS=machine_ip_address -p 7000:7000 cassandra:tag</kbd>
+where:
+  - --name: You define an name to the image
+  - CASSANDRA_BROADCAST_ADDRESS: it has to be the machine ip address
+  - -p: Is an port to access docker
+  - ":tag": Is where you define cassandra version.
+- Create a folder that will save the Cassandra information <kbd>$ sudo mkdir /var/lib/cassandra</kbd>
+- Using Machine1 as exemple, the command should be: <kbd>$ docker run --name climatos1 -v /var/lib/cassandra:/var/lib/cassandra -d -e CASSANDRA_BROADCAST_ADDRESS=10.10.10.1 -p 7000:7000 cassandra:3.11.6</kbd>
+- To create Cassandra replication nodes:
+  - Machine2: <kbd>$ docker run --name climatos2 -v /var/lib/cassandra:/var/lib/cassandra -d -e CASSANDRA_BROADCAST_ADDRESS=10.10.10.2 -p 7000:7000 -e CASSANDRA_SEEDS=10.10.10.1 cassandra:3.11.6</kbd>
+  - Machine3: <kbd>$ docker run --name climatos3 -v /var/lib/cassandra:/var/lib/cassandra -d -e CASSANDRA_BROADCAST_ADDRESS=10.10.10.3 -p 7000:7000 -e CASSANDRA_SEEDS=10.10.10.1 cassandra:3.11.6</kbd>
+### 5.2 Starting Cassandra Docker Cluster
+- To start a docker <kbd>$ docker start docker_name</kbd>
+- Using Machine1 as example: <kbd>$ docker start climatos1</kbd>
+## x. Useful Commands to Cassandra
+### x.x Droping node from cluster ring.
+- nodetool decommission
+### x.x Renaming the Cluster
 - <kbd>$ cqls</kbd>
 - <kbd>cqlsh> update system.local set cluster_name = 'new_cluster_name' where key='local'</kbd>
 - <kbd>cqls> exit</kbd>
-- Open the file <kbd>$ sudo nano /etc/cassandra/conf/cassandra.yaml</kbd>
-- The next x steps is in the same file
-    - Search for 'cluster_name: ' and change it's value to the name of your's cassandra cluster (this is equal to all nodes)
-    - Search for 'seeds' and insert the ip address of two cassandra nodes (more than this isn't recommended), for exemple, <kbd>- seeds: "192.168.122.100, 192.168.122.101"</kbd>
-    - Search for 'listen_address: ' and change it's value to correspond with IP ADDRESS of your current machine, for example, on Machine 1 <kbd>listen_address: 192.168.122.100</kbd>
+- Change the field "cluster_name" in /etc/cassandra/cassandra.yaml to the 'new_cluster_name'
 - <kbd>$ nodetool flush -- system</kbd>
-- Open the file <kbd>$ sudo nano /etc/cassandra/conf/cassandra.yaml</kbd>
-- 
 
-## 5. Usefull Commands to Cassandra
-### 5.1 Renaming the Cluster
-- <kbd>$ cqls</kbd>
-- <kbd>cqlsh> update system.local set cluster_name = 'new_cluster_name' where key='local'</kbd>
-- <kbd>cqls> exit</kbd>
-- <kbd>$ nodetool flush -- system</kbd>
+# X. References
+- https://hub.docker.com/_/cassandra
