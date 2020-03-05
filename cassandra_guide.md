@@ -68,19 +68,19 @@ $ sudo docker run hello-world
 - The result should be, something like this:
 ```
 To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
+ 1. The Docker client contacted the Docker daemon.  
  2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
+    (amd64)  
  3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
+    executable that produces the output you are currently reading.  
  4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
+    to your terminal.  
 
 To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
+ $ docker run -it ubuntu bash  
 
 Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/
+ https://hub.docker.com/  
 
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
@@ -89,17 +89,6 @@ For more examples and ideas, visit:
 - Add your user to the docker group to get rid of the need of typing ***sudo*** each time you run docker command <kbd>$ sudo usermod -aG docker $USER</kbd>
 
 # 5. Cassandra Docker Cluster
-Let's assume the following scenario:  
-- Machine1:
-  - IP: 10.10.10.1
-  - Docker name: climatos1
-- Machine2:
-  - IP: 10.10.10.2
-  - Docker name: climatos2
-- Machine3:
-  - IP: 10.10.10.3
-  - Docker name: climatos3
-- All in the same datacenter
 ## 5.1 Download Locally Cassandra Docker Image
 - Run <kbd>$ docker pull cassandra</kbd>
 - You can specify a version <kbd>$ docker pull cassandra:3.11.6</kbd>
