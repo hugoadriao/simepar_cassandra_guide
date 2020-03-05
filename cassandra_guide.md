@@ -53,38 +53,10 @@ To change to the new user, run this command.
     https://download.docker.com/linux/centos/docker-ce.repo
 ```
 - Install the latest version of Docker Engine - Community and containerd - with the following command
-<kbd>
-  $ sudo yum install docker-ce docker-ce-cli containerd.io
-</kbd>
+<kbd>$ sudo yum install docker-ce docker-ce-cli containerd.io</kbd>  
 # 4. Docker post-installation Steps
-- Start Docker
-<kbd>
-sudo systemctl start docker
-</kbd>
-- Verify that Docker is installed correctly
-<kbd>
-$ sudo docker run hello-world
-</kbd>
-- The result should be, something like this:
-```
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.  
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)  
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.  
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.  
-
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash  
-
-Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/  
-
-For more examples and ideas, visit:
- https://docs.docker.com/get-started/
-```
+- Start Docker <kbd>sudo systemctl start docker</kbd>
+- Verify that Docker is installed correctly <kbd>$ sudo docker run hello-world</kbd>
 - Enable Docker to autostart <kbd>sudo systemctl enable docker</kbd>
 - Add your user to the docker group to get rid of the need of typing ***sudo*** each time you run docker command <kbd>$ sudo usermod -aG docker $USER</kbd>
 
@@ -158,4 +130,3 @@ For more examples and ideas, visit:
 # 7 References
 - https://hub.docker.com/_/cassandra
 - https://docs.docker.com/install/linux/docker-ce/centos/
-- 
