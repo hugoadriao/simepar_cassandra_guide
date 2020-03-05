@@ -117,9 +117,11 @@ To change to the new user, run this command.
 ```
 - To change cassandra user permission, execute <kbd>new_root_user@cqlsh> ALTER ROLE cassandra WITH SUPERUSER = false AND LOGIN = false AND password='new_secret_pw';</kbd>
 - To drop cassandra account: <kbd>new_root_user@cqlsh> DROP ROLE cassandra;</kbd>
-- Exit from cqlsh <kbd>new_root_user@cqlsh EXIT;</kbd>
+- Exit from cqlsh <kbd>new_root_user@cqlsh EXIT;</kbd>  
+
 ## 6.2 Droping node from cluster ring.
-- nodetool decommission
+- nodetool decommission  
+
 ## 6.3 Renaming the Cluster
 - <kbd>$ cqls -u user_name</kbd>
 - <kbd>cqlsh> update system.local set cluster_name = 'new_cluster_name' where key='local';</kbd>
@@ -127,6 +129,12 @@ To change to the new user, run this command.
 - Change the field "cluster_name" in /etc/cassandra/cassandra.yaml to the 'new_cluster_name'
 - <kbd>$ nodetool flush -- system</kbd>
 
+## 6.4 Import and export cassandra keyspace
+- To export a keyspace schema <kbd>$ cqlsh -e "DESC KEYSPACE user" > user_schema.cql</kbd>
+- To export an entire database schema: <kbd>$ cqlsh -e "DESC SCHEMA" > db_schema.cql</kbd>
+- To import go to the file folder <kbd>$ /path/to/file.cql</kbd> and execute <kbd>$ cqlsh</kbd> then <kbd>user@cqlsh> source 'file.cql'</kbd> (the process to an entirer database schema is the same)
+
 # 7 References
 - https://hub.docker.com/_/cassandra
 - https://docs.docker.com/install/linux/docker-ce/centos/
+- https://stackoverflow.com/questions/16440606/import-and-export-schema-in-cassandra
