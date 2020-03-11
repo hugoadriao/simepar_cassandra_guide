@@ -167,7 +167,13 @@ To change to the new user, run this command.
 - Change the field "cluster_name" in /etc/cassandra/cassandra.yaml to the 'new_cluster_name'
 - <kbd>$ nodetool flush -- system</kbd>
 
+## 6.4 Import and export cassandra keyspace
+- To export a keyspace schema <kbd>$ cqlsh -e "DESC KEYSPACE user" > user_schema.cql</kbd>
+- To export an entire database schema: <kbd>$ cqlsh -e "DESC SCHEMA" > db_schema.cql</kbd>
+- To import go to the file folder <kbd>$ /path/to/file.cql</kbd> and execute <kbd>$ cqlsh</kbd> then <kbd>user@cqlsh> source 'file.cql'</kbd> (the process to an entirer database schema is the same)
+
 # 7 References
 
 - <https://hub.docker.com/_/cassandra>
 - <https://docs.docker.com/install/linux/docker-ce/centos/>
+- <https://stackoverflow.com/questions/16440606/import-and-export-schema-in-cassandra>
