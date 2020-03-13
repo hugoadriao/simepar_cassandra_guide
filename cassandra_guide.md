@@ -42,6 +42,8 @@ To change to the new user, run this command.
 
 # 3. Install Docker
 
+IF YOU WANT TO EXECUTE CASSANDRA WITHOUT A DOCKER, GO TO TOPIC 7
+
 - Unistall old Docker version
 
 ```
@@ -172,7 +174,44 @@ To change to the new user, run this command.
 - To export an entire database schema: <kbd>$ cqlsh -e "DESC SCHEMA" > db_schema.cql</kbd>
 - To import go to the file folder <kbd>$ /path/to/file.cql</kbd> and execute <kbd>$ cqlsh</kbd> then <kbd>user@cqlsh> source 'file.cql'</kbd> (the process to an entirer database schema is the same)
 
-# 7 References
+# 7 Starting Cassandra Without Docker
+
+## 7.1 Installing JAVA 8 (Openjkd)
+- To install Java execute:
+  - <kbd>$ sudo yum -y update</kbd>
+  - <kbd>$ yum -y install java-1.8.0-openjdk</kbd>
+- To verify if JAVA is installed:
+  - <kbd>$ java -version</kbd>
+
+## 7.2 Setting JAVA's Path in Your Environment
+
+- Find JAVA's path, with this command: <kbd>$ update-alternatives --config java</kbd>
+  - It will show a java path like <kbd>/some/path/java-ver.si.on-openjdk-..._64/bin/java</kbd> copy that path
+- Execute <kbd>$ vim .bash_profile</kbd>
+- Copy at the bottom of the file your java's path <kbd>export JAVA_HOME=/some/path/java-ver.si.on-openjdk-..._64/bin/java</kbd>
+- Than <kbd>$ source .bash_profile</kbd>
+- With the command <kbd>echo $JAVA_HOME</kbd> you'll now be able to see the path you set
+
+## 7.3 Downloading Cassandra
+
+- Chose a folder to install cassandra, then execute <kbd>wget 'https://downloads.datastax.com/ddac/ddac-5.1.17-bin.tar.gz'</kbd>
+  - You can access the latest version of Cassandra in: <https://downloads.datastax.com/#ddac> or simply type "cassandra datastax" and look for Download then DataStax Distribution of Apache Cassandra, chose the latest version and Tarball package.
+- To unTar <kbd>$ tar -zxvf ddac-ver.si.on-bin.tar.gz</kbd>
+- <kbd>$ sudo mkdir /var/log/cassandra</kbd>
+- <kbd>$ sudo mkdir /var/lib/cassandra</kbd>
+- <kbd>$ sudo chown -R \$USER:$GROUP /var/log/cassandra</kbd>
+- <kbd>$ sudo chown -R \$USER:$GROUP /var/lib/cassandra</kbd>
+- <kbd>$ cd ddac-ver.si.on-bin.tar.gz/bin<kbd>
+- <kbd>$ vim cassandra</kbd>
+- Look for <kbd>for java in "\$JAVA_HOME"/bin/amd64/java "$JAVA_HOME"/bin/java; do </kbd>
+- Comment that line with <kbd>#</kbd>
+- At the end of the line hit Enter and add this <kbd>code for java in "$JAVA_HOME"; do</kbd>
+- Save the file
+- Go up one level <kbd>$ cd ..</kbd>
+- Execute <kbd>$ bin/cassandra</kbd>
+- Cassandra is running
+
+# 8 References
 
 - <https://hub.docker.com/_/cassandra>
 - <https://docs.docker.com/install/linux/docker-ce/centos/>
