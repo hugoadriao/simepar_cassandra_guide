@@ -248,4 +248,66 @@ Considering this scenario:
 - By having a separate drive for the commit log, the disk head does not need to move, and so can continuously be used to write commit log entries
 - It is fine for the commit log disk to be a spinning disk, as the disk head does not need to move
   - This configuration can be defined in cassandra.yaml file
-  - 
+
+## 8.4 Deploying in The Cloud
+
+- Amazon AWS EC2
+
+| Data per Node | Instance Type | Memory | Disk      | Network Performance |
+|---------------|---------------|--------|-----------|---------------------|
+| < 100Gb       | m1.xlarge     | 15Gb   | Ephemeral | High                |
+| < 100Gb       | c3.2xlarge    | 15Gb   | SSD       | High                |
+| < 1 Tb        | i2.2xlarge    | 60Gb   | SSD       | High                |
+
+- Google Cloud Compute Engine
+
+| Data per Node 	| Instance Type 	| Memory 	| Disk                 	|
+|---------------	|---------------	|--------	|----------------------	|
+| < 200Gb       	| n1-standard-8 	| 30Gb   	| 2 Tb persistent disk 	|
+| < 1Tb         	| n1-highmen-16 	| 104Gb  	| 4 Tb persistent disk 	|
+
+# 9 Adding Nodes to a Cluster Cassandra
+
+## 9.1 Understanding Cassandra Nodes
+
+- As each node in a Cassandra cluster has the same functionality as the others, it is fairly easy to add a new node
+- to add a new node, it needs:
+  - To have the same cluster name as the existing nodes in the cluster
+  - The UP address (and network access) to at least one of the nodes in the existing cluster
+
+## 9.2 Specifying the IP Adress of a Node in Cassandra
+
+- The listen_address and rpc_address properties in the cassandra.yaml file of each node ned to be assigned the IP address of the node
+  - listen_addres: is used to other nodes to communicate with the current node
+  - rpc_address: is used to communicate with a client application
+
+## 9.3 Specifying Seed Nodes
+
+- Seed nodes are regular nodes that, via their IP address, provide a way for new nodes to join the cluster
+- The IP address for at least one sed node is needed for a node to be able to join the cluster
+- Seed nodes are specified in the seeds property of the cassandra.yaml file of each node in a cluster as a comma-separated list
+  - e.g. <kbd>seeds: "192.168.159.101, 192.168.159.102</kbd>
+- It is common to list the IP address of the first two or three nodes in a cluster, so that if the first node is down, there is an alternative node for any joining nodes to use to get into the cluster
+
+## 9.4 Bootstrapping a Node
+
+- Adding a node to a cluster is called "bootstrapping"
+- In order to bootstrap a node, it needs to have the same cluster name as the nodes in the cluster it is to join, and it needs to be on a network that allows it to connect to the IP address of at least one of the seed nodes
+- Once a node is able to join a cluster, if the auto_bootstrap property is set to true, the node will start to take on responsibility for the data in it's token range(s)
+- The node will begin by accepting write requests and then eventually also accept read requests
+- If there are multiple nodes to be bootstrapped, give time between each one so that the cluster can smoothly bootstrap each node
+
+## 9.5 Cleaning Up a Node
+
+- When a node auto bootstraps, it does not remove the data from the node that had previously been responsible for the data. This is so that, if the new node were to go down shortly after coming online, the data would still exist
+- To tell Cassandra to delete the data that a node is no longer reponsible for, the cleanup command can be used
+  - <kbd>nodetool -h IP_ADDRESS cleanup</kbd>
+
+## 9.6 Using cassandra-stress
+
+- The cassandra-stress tool, which comes with Cassandra, is handy for stress-testing a cluster
+- It can be used to write data, or read data, from a Cassandra cluster
+  - Fro example, cassandra-stress could be used to generate and write 100000 rows of data
+    - <kbd>cassandra-stress write n=100000 -node IP_ADDRESS</kbd>
+    - In using cassandra-stress, a keyspace with a replication factor of 1 named Keyspace1 gets generated. Within Keyspace1, tables named Standard1, Super1, SuperCounter1, Counter1, and Counter3 are generated depending on the cassandra-stress option used
+  - The cassandra-stress tool has many options, which can be viewed by running <kbd>cassandra-stress -h</kbd>
