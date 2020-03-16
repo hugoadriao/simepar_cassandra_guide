@@ -194,8 +194,11 @@ IF YOU WANT TO EXECUTE CASSANDRA WITHOUT A DOCKER, GO TO TOPIC 7
 
 ## 7.3 Downloading Cassandra
 
-- Chose a folder to install cassandra, then execute <kbd>wget 'https://downloads.datastax.com/ddac/ddac-5.1.17-bin.tar.gz'</kbd>
+- Chose a folder to install cassandra, then execute <kbd>wget 'https://downloads.datastax.com/ddac/ddac-5.1.17-bin.tar.gz'</kbd> to download
   - You can access the latest version of Cassandra in: <https://downloads.datastax.com/#ddac> or simply type "cassandra datastax" and look for Download then DataStax Distribution of Apache Cassandra, chose the latest version and Tarball package.
+
+## 7.4 Installing Cassandra
+
 - To unTar <kbd>$ tar -zxvf ddac-ver.si.on-bin.tar.gz</kbd>
 - <kbd>$ sudo mkdir /var/log/cassandra</kbd>
 - <kbd>$ sudo mkdir /var/lib/cassandra</kbd>
