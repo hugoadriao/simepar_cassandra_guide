@@ -311,3 +311,55 @@ Considering this scenario:
     - <kbd>cassandra-stress write n=100000 -node IP_ADDRESS</kbd>
     - In using cassandra-stress, a keyspace with a replication factor of 1 named Keyspace1 gets generated. Within Keyspace1, tables named Standard1, Super1, SuperCounter1, Counter1, and Counter3 are generated depending on the cassandra-stress option used
   - The cassandra-stress tool has many options, which can be viewed by running <kbd>cassandra-stress -h</kbd>
+
+# 10 Monitoring a Cluster
+
+Tools for monitoring Cassandra include nodetool, JConsole ans OpsCenter. All of these tools work by communicating with Cassandra through JMX (Java Management Extesions). Through JMX, Cassandra exposes many metrics and commands, which any of these tools can use to monitor and manage a Cassandra cluster.
+
+## 10.1 Nodetool
+
+- Provided with Cassandra, nodetool is available on the command line via it's excutable, located in the bin subdirectory where Cassandra is installed
+  - <kbd>$ bin/nodetool status</kbd> to see basic informations about the cluster
+  - <kbd>$ bin/nodetool info</kbd> for information on a particular node
+  - <kbd>$ bin/nodetool ring</kbd> for seeing which node each token range is assigned to
+  - <kbd>$ bin/nodetool cfstats</kbd> to see statistics for all the key spaces in tables
+    - CF stands for "Column Family" which is the old phrase for table
+  - <kbd>$ bin/nodetool cfhistograms</kbd> to see the read and write latency for a given table
+  - <kbd>$ bin/nodetool comapactionstats</kbd> to see compaction information
+  - To get all possible commands execute <kbd>$ bin/nodetool</kbd>
+
+## 10.2 JConsole
+
+- JConsole, which comes with JDK, is a tool for looking inside a Java process
+- Look for your Java's directory <kbd>$ update-alternatives --config java</kbd>
+- Open your Java's directory <kbd>$ cd /path/to/jdk/jdkver.si.on_release</kbd>
+- Open jconsole <kbd>$ bin/jconsole &</kbd>
+- Select the "Remote Process" radial buttom and then type "localhost:7199"
+- It will appear an "insecure" option, choose that one
+- After that will appear a screen with some informations, look for a tab called "MBeans". On this tab look for "org.apache.cassandra.metrics" you'll find a loot of metrics about cassandra.
+
+## 10.3 DataStax OpsCenter
+
+- DataStax OpsCenter is a GUI web application for managing a Cassandra cluster
+- To be able o use OpsCenter, OpsCenter needs to be installed on a server, and then OpsCenter Agent needs to be insalled on each of the nodes in the cluster, so that OpsCenter can communicate wit each of the nodes
+- Once OpsCenter is installed, it can be accessed by opening a browser window and specifying the I address of the server that it is installed on, with 8888 as the port number
+- For the installantion check DataStax site <https://docs.datastax.com/en/install/6.7/install/installDSagents.html>
+
+# 11 Repairing Nodes
+
+## 11.1 Understanding Repair
+
+- Repair is for updating a node's data to be current
+- This comes into play when you are using a repliaction factor higher than 1
+- Examples of reasons for why data can get outdated on a node include that the node has been down, that the replication factor for a keyspace has been increased (in decreasing the replication factor, you would just do a cleanup), or that the token range(s) for a node have changed
+- Repair should be run on each nodeat least once within the gc_grace_seconds period of time, so that data marked as deleted on one node does not come back to life through another node, because the other node was unaware of the delte (e.g. from being down)
+- Given that the default gc_grace_seconds value is 10 days, running repair at least **once a week** is recommended
+- Although it is not common to change the replication factor of a keyspace, it is possible with the *ALTER KEYSPACE* command
+  - <kbd>ALTER KEYSPACE keyspace_name WITH REPLICATION = {'class':'SimpleStrategy', ' replication_factor':2};</kbd>
+
+## 11.2 Repairing Nodes
+
+- To repair nods, the nodetool repair command can be used <kbd>$ bin/nodetool -h IP_ADDRESS repair</kbd>
+- To specify the repairing of just one keyspace (e.g. after increasing the replication factor of a specific keyspace), the keyspace name can be included in the nodetool repair command <kbd>bin/nodetool -h IP_ADDRESS repair keyspace_name</kbd>
+- Since repair can put a heavy load on the cluster, it is best to run repair during low-usage hours and to **stagger** the repairing of nodes so that the system is not overwhelmed with comparing and reconciling data on all the nodes at the same time
+- If using OpsCenterEnterprise, there is an option to have OpsCenter automatically run a continuous repair service in the background, with minimal impact on the performance of the cluster 
